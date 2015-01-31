@@ -26,7 +26,7 @@ trait Slugabble {
      * @param int $duplicates_count
      * @return string
      */
-    protected static function makeSlug($title, $duplicates_count = 0)
+    protected function makeSlug($title, $duplicates_count = 0)
     {
         $duplicates_count = (int) $duplicates_count;
 
@@ -39,14 +39,14 @@ trait Slugabble {
             $slug = $slug.'-'.$duplicates_count;
             $rowCount = \DB::table($this->getTable())->where('slug', $slug)->count();
             if ($rowCount > 0) {
-                return static::makeSlug($title, ++$duplicates_count);
+                return $this->makeSlug($title, ++$duplicates_count);
             } else {
                 return $slug;
             }
         } else {
             $rowCount = \DB::table($this->getTable())->where('slug', $title)->count();
             if ($rowCount > 0) {
-                return static::makeSlug($title, ++$duplicates_count);
+                return $this->makeSlug($title, ++$duplicates_count);
             } else {
                 return $title;
             }
