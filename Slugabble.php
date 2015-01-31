@@ -39,14 +39,14 @@ trait Slugabble {
             $slug = $slug.'-'.$duplicates_count;
             $rowCount = \DB::table($this->getTable())->where('slug', $slug)->count();
             if ($rowCount > 0) {
-                return static::getSlug($title, ++$duplicates_count);
+                return static::makeSlug($title, ++$duplicates_count);
             } else {
                 return $slug;
             }
         } else {
             $rowCount = \DB::table($this->getTable())->where('slug', $title)->count();
             if ($rowCount > 0) {
-                return static::getSlug($title, ++$duplicates_count);
+                return static::makeSlug($title, ++$duplicates_count);
             } else {
                 return $title;
             }
@@ -57,7 +57,7 @@ trait Slugabble {
      * Generates slug
      */
     public function newSlug(){
-        $this->slug = $this->getSlug($this->getSluggableString());
+        $this->slug = $this->makeSlug($this->getSluggableString());
     }
 
     /**
