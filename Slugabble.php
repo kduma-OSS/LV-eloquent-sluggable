@@ -66,7 +66,7 @@ trait Slugabble {
     public function save(array $options=[]){
         if($this->slug == '')
             $this->newSlug();
-        parent::save($options);
+        return parent::save($options);
     }
 
     /**
