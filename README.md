@@ -7,7 +7,7 @@ Add the package to the require section of your composer.json and run `composer u
     "kduma/eloquent-sluggable": "~1.0"
 
 # Prepare models
-In your model add following lines:
+Inside your model (not on top of file) add following lines:
     
     use \KDuma\Eloquent\Slugabble;
 
