@@ -1,10 +1,16 @@
 # L5-eloquent-sluggable
+[![Latest Stable Version](https://poser.pugx.org/kduma/eloquent-sluggable/v/stable.svg)](https://packagist.org/packages/kduma/eloquent-sluggable) 
+[![Total Downloads](https://poser.pugx.org/kduma/eloquent-sluggable/downloads.svg)](https://packagist.org/packages/kduma/eloquent-sluggable) 
+[![Latest Unstable Version](https://poser.pugx.org/kduma/eloquent-sluggable/v/unstable.svg)](https://packagist.org/packages/kduma/eloquent-sluggable) 
+[![License](https://poser.pugx.org/kduma/eloquent-sluggable/license.svg)](https://packagist.org/packages/kduma/eloquent-sluggable)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/5cc51ad6-606c-43d5-bb3b-6f0bbde61dd0/mini.png)](https://insight.sensiolabs.com/projects/5cc51ad6-606c-43d5-bb3b-6f0bbde61dd0)
+
 Eases using and generating slugs Laravel Eloquent models.
 
 # Setup
 Add the package to the require section of your composer.json and run `composer update`
 
-    "kduma/eloquent-sluggable": "~1.0"
+    "kduma/eloquent-sluggable": "^1.1"
 
 # Prepare models
 Inside your model (not on top of file) add following lines:
