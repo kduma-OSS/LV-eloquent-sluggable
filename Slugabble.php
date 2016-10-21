@@ -1,25 +1,25 @@
 <?php
+
 namespace KDuma\Eloquent;
 
 use Illuminate\Support\Str;
 
-
 /**
- * Class Slugabble
- * @package KDuma\Eloquent
+ * Class Slugabble.
  */
-trait Slugabble {
-
-
+trait Slugabble
+{
     /**
      * @return mixed
      */
-    protected function getSluggableString(){
-        if(method_exists($this, 'SluggableString'))
+    protected function getSluggableString()
+    {
+        if (method_exists($this, 'SluggableString')) {
             return $this->SluggableString();
+        }
+
         return $this->title;
     }
-
 
     /**
      * @param $title
@@ -32,8 +32,9 @@ trait Slugabble {
 
         $slug = $title = Str::slug($title);
 
-        if($slug == $this->slug)
+        if ($slug == $this->slug) {
             return $slug;
+        }
 
         if ($duplicates_count > 0) {
             $slug = $slug.'-'.$duplicates_count;
@@ -54,18 +55,22 @@ trait Slugabble {
     }
 
     /**
-     * Generates slug
+     * Generates slug.
      */
-    public function newSlug(){
+    public function newSlug()
+    {
         $this->slug = $this->makeSlug($this->getSluggableString());
     }
 
     /**
      * @param array $options
      */
-    public function save(array $options=[]){
-        if($this->slug == '')
+    public function save(array $options = [])
+    {
+        if ($this->slug == '') {
             $this->newSlug();
+        }
+
         return parent::save($options);
     }
 
