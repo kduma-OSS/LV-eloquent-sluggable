@@ -4,6 +4,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/kduma/eloquent-sluggable/v/unstable.svg)](https://packagist.org/packages/kduma/eloquent-sluggable) 
 [![License](https://poser.pugx.org/kduma/eloquent-sluggable/license.svg)](https://packagist.org/packages/kduma/eloquent-sluggable)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/5cc51ad6-606c-43d5-bb3b-6f0bbde61dd0/mini.png)](https://insight.sensiolabs.com/projects/5cc51ad6-606c-43d5-bb3b-6f0bbde61dd0)
+[![StyleCI](https://styleci.io/repos/30116299/shield?branch=master)](https://styleci.io/repos/30116299)
 
 Eases using and generating slugs Laravel Eloquent models.
 
