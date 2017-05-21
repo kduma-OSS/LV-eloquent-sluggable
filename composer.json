@@ -18,5 +18,11 @@
       "KDuma\\Eloquent\\": ""
     }
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master-v1": "1.x-dev",
+      "dev-master": "2.x-dev"
+    }
+  }
 }
