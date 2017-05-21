@@ -37,9 +37,9 @@ By default it generates slug on first save.
 - `Model::whereSlug($slug)->first()` - Find by slug. (`whereSlug` is query scope)
    
 
-# euantorano
+# Eric L. Barnes
 
-A special thanks to [euantorano](http://forumsarchive.laravel.io/viewtopic.php?id=6629#6), an original code creator that this package is based on.
+A special thanks to [Eric L. Barnes](https://dotdev.co/creating-unique-title-slugs-with-laravel/), an original code creator that this package is based on.
 
 # Packagist
 View this package on Packagist.org: [kduma/eloquent-sluggable](https://packagist.org/packages/kduma/eloquent-sluggable)
