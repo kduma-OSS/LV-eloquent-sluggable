@@ -20,18 +20,20 @@ class SluggableTest extends PHPUnit_Framework_TestCase
             ->withArgs(['2017-lorem-ipsum-dolor-sit-ament'])
             ->andReturn($ExistingSlugs);
 
-        if(!$ExpectedSlug){
+        if (! $ExpectedSlug) {
             $this->expectException('Exception');
             $this->expectExceptionMessage('Can not create a unique slug');
         }
 
         $TestModel->generateSlug();
 
-        if($ExpectedSlug)
+        if ($ExpectedSlug) {
             $this->assertEquals($ExpectedSlug, $TestModel->slug);
+        }
     }
 
-    public function provideExistingSlugs() {
+    public function provideExistingSlugs()
+    {
         return [
             'empty' => ['2017-lorem-ipsum-dolor-sit-ament', collect()],
 
@@ -44,11 +46,11 @@ class SluggableTest extends PHPUnit_Framework_TestCase
                 ['slug' => '2017-lorem-ipsum-dolor-sit-ament-1'],
             ])],
 
-            'fifthy-duplicates' => ['2017-lorem-ipsum-dolor-sit-ament-51', collect(range(0, 50))->map(function($num){
+            'fifthy-duplicates' => ['2017-lorem-ipsum-dolor-sit-ament-51', collect(range(0, 50))->map(function ($num) {
                 return ['slug' => '2017-lorem-ipsum-dolor-sit-ament'.($num ? '-'.$num : '')];
             })],
 
-            'hundread-duplicates' => [false, collect(range(0, 100))->map(function($num){
+            'hundread-duplicates' => [false, collect(range(0, 100))->map(function ($num) {
                 return ['slug' => '2017-lorem-ipsum-dolor-sit-ament'.($num ? '-'.$num : '')];
             })],
         ];
@@ -70,18 +72,17 @@ class SluggableTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-donec-et', $TestModel->slug);
     }
-
 }
 
-
 /**
- * Class TestModel
+ * Class TestModel.
  */
-class TestModel {
+class TestModel
+{
     use \KDuma\Eloquent\Slugabble;
 
     /**
-     * @var integer
+     * @var int
      */
     public $year;
 
@@ -109,15 +110,17 @@ class TestModel {
     /**
      * @return string
      */
-    protected function SluggableString(){
+    protected function SluggableString()
+    {
         return $this->year.' '.$this->title;
     }
 }
 
 /**
- * Class TestModelWithoutCustomSlugGenerator
+ * Class TestModelWithoutCustomSlugGenerator.
  */
-class TestModelWithoutCustomSlugGenerator {
+class TestModelWithoutCustomSlugGenerator
+{
     use \KDuma\Eloquent\Slugabble;
 
     /**

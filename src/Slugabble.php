@@ -56,7 +56,7 @@ trait Slugabble
         $existingSlugs = $this->getExistingSlugs($slug);
 
         // If we haven't used it before then we are all good.
-        if (! $existingSlugs->contains('slug', $slug)){
+        if (! $existingSlugs->contains('slug', $slug)) {
             return $slug;
         }
 
@@ -99,7 +99,7 @@ trait Slugabble
      */
     public function getExistingSlugs($slug)
     {
-        return self::select('slug')->where('slug', 'like', $slug . '%')
+        return self::select('slug')->where('slug', 'like', $slug.'%')
             ->when($this->id, function ($query) {
                 return $query->where('id', '<>', $this->id);
             })
