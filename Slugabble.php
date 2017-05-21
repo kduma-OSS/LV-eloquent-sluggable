@@ -3,12 +3,30 @@
 namespace KDuma\Eloquent;
 
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Slugabble.
  */
 trait Slugabble
 {
+    /**
+     * Boot the trait.
+     */
+    protected static function bootSlugabble()
+    {
+        static::creating(function (Model $model) {
+            if ($model->slug == '') {
+                $model->generateSlug();
+            }
+        });
+        static::updating(function (Model $model) {
+            if ($model->slug == '') {
+                $model->generateSlug();
+            }
+        });
+    }
+
     /**
      * @return mixed
      */
@@ -23,55 +41,44 @@ trait Slugabble
 
     /**
      * @param $title
-     * @param int $duplicates_count
      * @return string
+     * @throws \Exception
      */
-    protected function makeSlug($title, $duplicates_count = 0)
+    protected function findSlug($title)
     {
-        $duplicates_count = (int) $duplicates_count;
+        // Normalize the title
+        $slug = Str::slug($title);
 
-        $slug = $title = Str::slug($title);
+        // Get any that could possibly be related.
+        // This cuts the queries down by doing it once.
+        $allSlugs = self::select('slug')->where('slug', 'like', $slug.'%')
+            ->when($this->id, function ($query) {
+                return $query->where('id', '<>', $this->id);
+            })
+            ->get();
 
-        if ($slug == $this->slug) {
+        // If we haven't used it before then we are all good.
+        if (! $allSlugs->contains('slug', $slug)){
             return $slug;
         }
 
-        if ($duplicates_count > 0) {
-            $slug = $slug.'-'.$duplicates_count;
-            $rowCount = \DB::table($this->getTable())->where('slug', $slug)->count();
-            if ($rowCount > 0) {
-                return $this->makeSlug($title, ++$duplicates_count);
-            } else {
-                return $slug;
-            }
-        } else {
-            $rowCount = \DB::table($this->getTable())->where('slug', $title)->count();
-            if ($rowCount > 0) {
-                return $this->makeSlug($title, ++$duplicates_count);
-            } else {
-                return $title;
+        // Just append numbers like a savage until we find not used.
+        for ($i = 1; $i <= 100; $i++) {
+            $newSlug = $slug.'-'.$i;
+            if (! $allSlugs->contains('slug', $newSlug)) {
+                return $newSlug;
             }
         }
+
+        throw new \Exception('Can not create a unique slug');
     }
 
     /**
      * Generates slug.
      */
-    public function newSlug()
+    public function generateSlug()
     {
-        $this->slug = $this->makeSlug($this->getSluggableString());
-    }
-
-    /**
-     * @param array $options
-     */
-    public function save(array $options = [])
-    {
-        if ($this->slug == '') {
-            $this->newSlug();
-        }
-
-        return parent::save($options);
+        $this->slug = $this->findSlug($this->getSluggableString());
     }
 
     /**
@@ -79,7 +86,7 @@ trait Slugabble
      * @param $slug
      * @return bool|int
      */
-    public function scopeWhereToken($query, $slug)
+    public function scopeWhereSlug($query, $slug)
     {
         return $query->where('slug', $slug);
     }
