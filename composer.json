@@ -15,7 +15,7 @@
   },
   "autoload": {
     "psr-4": {
-      "KDuma\\Eloquent\\": ""
+      "KDuma\\Eloquent\\": "src/"
     }
   },
   "minimum-stability": "dev",
