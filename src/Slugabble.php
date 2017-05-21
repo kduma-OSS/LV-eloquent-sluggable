@@ -51,21 +51,17 @@ trait Slugabble
 
         // Get any that could possibly be related.
         // This cuts the queries down by doing it once.
-        $allSlugs = self::select('slug')->where('slug', 'like', $slug.'%')
-            ->when($this->id, function ($query) {
-                return $query->where('id', '<>', $this->id);
-            })
-            ->get();
+        $existingSlugs = $this->getExistingSlugs($slug);
 
         // If we haven't used it before then we are all good.
-        if (! $allSlugs->contains('slug', $slug)){
+        if (! $existingSlugs->contains('slug', $slug)){
             return $slug;
         }
 
         // Just append numbers like a savage until we find not used.
         for ($i = 1; $i <= 100; $i++) {
             $newSlug = $slug.'-'.$i;
-            if (! $allSlugs->contains('slug', $newSlug)) {
+            if (! $existingSlugs->contains('slug', $newSlug)) {
                 return $newSlug;
             }
         }
@@ -85,9 +81,24 @@ trait Slugabble
      * @param $query
      * @param $slug
      * @return bool|int
+     *
+     * @codeCoverageIgnore Eloquent specific code
      */
     public function scopeWhereSlug($query, $slug)
     {
         return $query->where('slug', $slug);
+    }
+
+    /**
+     * @param $slug
+     * @return mixed
+     */
+    public function getExistingSlugs($slug)
+    {
+        return self::select('slug')->where('slug', 'like', $slug . '%')
+            ->when($this->id, function ($query) {
+                return $query->where('id', '<>', $this->id);
+            })
+            ->get();
     }
 }
