@@ -12,6 +12,8 @@ trait Slugabble
 {
     /**
      * Boot the trait.
+     *
+     * @codeCoverageIgnore Eloquent specific code
      */
     protected static function bootSlugabble()
     {
@@ -92,6 +94,8 @@ trait Slugabble
     /**
      * @param $slug
      * @return mixed
+     *
+     * @codeCoverageIgnore Eloquent specific code
      */
     public function getExistingSlugs($slug)
     {
