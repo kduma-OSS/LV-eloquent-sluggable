@@ -1,7 +1,11 @@
 {
   "name": "kduma/eloquent-sluggable",
   "description": "Eases using and generating slugs Laravel Eloquent models.",
-  "keywords": ["laravel", "eloquent", "slug"],
+  "keywords": [
+    "laravel",
+    "eloquent",
+    "slug"
+  ],
   "license": "MIT",
   "authors": [
     {
