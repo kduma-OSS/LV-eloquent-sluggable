@@ -10,6 +10,8 @@
 
 Eases using and generating slugs Laravel Eloquent models.
 
+Check full documentation here: [opensource.duma.sh/libraries/php/eloquent-sluggable](https://opensource.duma.sh/libraries/php/eloquent-sluggable)
+
 # Setup
 Add the package to the require section of your composer.json and run `composer update`
 
