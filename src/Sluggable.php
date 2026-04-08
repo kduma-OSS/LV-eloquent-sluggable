@@ -40,7 +40,7 @@ trait Sluggable
 
         $from = $this->resolveSluggableConfig('from', 'sluggable_from', 'title');
 
-        return $this->{$from};
+        return (string) $this->{$from};
     }
 
     protected function findSlug(string $title): string
@@ -59,7 +59,7 @@ trait Sluggable
             }
         }
 
-        throw new \RuntimeException('Can not create a unique slug');
+        throw new \RuntimeException('Cannot create a unique slug after 100 attempts');
     }
 
     public function generateSlug(): void
