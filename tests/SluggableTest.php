@@ -1,38 +1,41 @@
 <?php
 
-class SluggableTest extends PHPUnit_Framework_TestCase
+declare(strict_types=1);
+
+use KDuma\Eloquent\Sluggable;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+
+class SluggableTest extends TestCase
 {
-    public function tearDown()
-    {
-        Mockery::close();
-    }
+    use MockeryPHPUnitIntegration;
 
-    /**
-     * @test
-     * @dataProvider provideExistingSlugs
-     */
-    public function test_slug_generation($ExpectedSlug, $ExistingSlugs)
+    #[Test]
+    #[DataProvider('provideExistingSlugs')]
+    public function test_slug_generation(string|false $expectedSlug, \Illuminate\Support\Collection $existingSlugs): void
     {
-        $TestModel = Mockery::mock('TestModel[getExistingSlugs]', [2017, 'Lorem ipsum dolor sit ament...']);
+        $testModel = Mockery::mock('TestModel[getExistingSlugs]', [2017, 'Lorem ipsum dolor sit ament...']);
 
-        $TestModel->shouldReceive('getExistingSlugs')
+        $testModel->shouldReceive('getExistingSlugs')
             ->once()
             ->withArgs(['2017-lorem-ipsum-dolor-sit-ament'])
-            ->andReturn($ExistingSlugs);
+            ->andReturn($existingSlugs);
 
-        if (! $ExpectedSlug) {
-            $this->expectException('Exception');
-            $this->expectExceptionMessage('Can not create a unique slug');
+        if ($expectedSlug === false) {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('Cannot create a unique slug after 100 attempts');
         }
 
-        $TestModel->generateSlug();
+        $testModel->generateSlug();
 
-        if ($ExpectedSlug) {
-            $this->assertEquals($ExpectedSlug, $TestModel->slug);
+        if ($expectedSlug !== false) {
+            $this->assertEquals($expectedSlug, $testModel->slug);
         }
     }
 
-    public function provideExistingSlugs()
+    public static function provideExistingSlugs(): array
     {
         return [
             'empty' => ['2017-lorem-ipsum-dolor-sit-ament', collect()],
@@ -46,99 +49,56 @@ class SluggableTest extends PHPUnit_Framework_TestCase
                 ['slug' => '2017-lorem-ipsum-dolor-sit-ament-1'],
             ])],
 
-            'fifthy-duplicates' => ['2017-lorem-ipsum-dolor-sit-ament-51', collect(range(0, 50))->map(function ($num) {
-                return ['slug' => '2017-lorem-ipsum-dolor-sit-ament'.($num ? '-'.$num : '')];
+            'fifty-duplicates' => ['2017-lorem-ipsum-dolor-sit-ament-51', collect(range(0, 50))->map(function (int $num): array {
+                return ['slug' => '2017-lorem-ipsum-dolor-sit-ament' . ($num ? '-' . $num : '')];
             })],
 
-            'hundread-duplicates' => [false, collect(range(0, 100))->map(function ($num) {
-                return ['slug' => '2017-lorem-ipsum-dolor-sit-ament'.($num ? '-'.$num : '')];
+            'hundred-duplicates' => [false, collect(range(0, 100))->map(function (int $num): array {
+                return ['slug' => '2017-lorem-ipsum-dolor-sit-ament' . ($num ? '-' . $num : '')];
             })],
         ];
     }
 
-    /**
-     * @test
-     */
-    public function test_slug_generation_without_custom_slug_generator()
+    #[Test]
+    public function test_slug_generation_without_custom_slug_generator(): void
     {
-        $TestModel = Mockery::mock('TestModelWithoutCustomSlugGenerator[getExistingSlugs]', ['Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et...']);
+        $testModel = Mockery::mock('TestModelWithoutCustomSlugGenerator[getExistingSlugs]', ['Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et...']);
 
-        $TestModel->shouldReceive('getExistingSlugs')
+        $testModel->shouldReceive('getExistingSlugs')
             ->once()
             ->withArgs(['lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-donec-et'])
             ->andReturn(collect());
 
-        $TestModel->generateSlug();
+        $testModel->generateSlug();
 
-        $this->assertEquals('lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-donec-et', $TestModel->slug);
+        $this->assertEquals('lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-donec-et', $testModel->slug);
     }
 }
 
-/**
- * Class TestModel.
- */
 class TestModel
 {
-    use \KDuma\Eloquent\Slugabble;
+    use Sluggable;
 
-    /**
-     * @var int
-     */
-    public $year;
+    public string $slug = '';
 
-    /**
-     * @var string
-     */
-    public $title;
+    public function __construct(
+        public int $year,
+        public string $title,
+    ) {}
 
-    /**
-     * @var string
-     */
-    public $slug;
-
-    /**
-     * TestModel constructor.
-     * @param int $year
-     * @param string $title
-     */
-    public function __construct($year, $title)
+    protected function SluggableString(): string
     {
-        $this->year = $year;
-        $this->title = $title;
-    }
-
-    /**
-     * @return string
-     */
-    protected function SluggableString()
-    {
-        return $this->year.' '.$this->title;
+        return $this->year . ' ' . $this->title;
     }
 }
 
-/**
- * Class TestModelWithoutCustomSlugGenerator.
- */
 class TestModelWithoutCustomSlugGenerator
 {
-    use \KDuma\Eloquent\Slugabble;
+    use Sluggable;
 
-    /**
-     * @var string
-     */
-    public $title;
+    public string $slug = '';
 
-    /**
-     * @var string
-     */
-    public $slug;
-
-    /**
-     * TestModelWithoutCustomSlugGenerator constructor.
-     * @param string $title
-     */
-    public function __construct($title)
-    {
-        $this->title = $title;
-    }
+    public function __construct(
+        public string $title,
+    ) {}
 }
