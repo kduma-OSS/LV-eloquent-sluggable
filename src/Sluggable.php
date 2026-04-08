@@ -1,108 +1,104 @@
 <?php
+declare(strict_types=1);
 
 namespace KDuma\Eloquent;
 
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use KDuma\Eloquent\Attributes\HasSlug;
 
-/**
- * Class Sluggable.
- */
 trait Sluggable
 {
-    /**
-     * Boot the trait.
-     *
-     * @codeCoverageIgnore Eloquent specific code
-     */
-    protected static function bootSluggable()
+    protected static function bootSluggable(): void
     {
-        static::creating(function (Model $model) {
-            if ($model->slug == '') {
+        static::creating(function (Model $model): void {
+            $field = $model->getSlugField();
+            if ($model->{$field} === '' || $model->{$field} === null) {
                 $model->generateSlug();
             }
         });
-        static::updating(function (Model $model) {
-            if ($model->slug == '') {
+        static::updating(function (Model $model): void {
+            $field = $model->getSlugField();
+            if ($model->{$field} === '' || $model->{$field} === null) {
                 $model->generateSlug();
             }
         });
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getSluggableString()
+    public function getSlugField(): string
+    {
+        return $this->resolveSluggableConfig('field', 'slug_field', 'slug');
+    }
+
+    protected function getSluggableString(): string
     {
         if (method_exists($this, 'SluggableString')) {
             return $this->SluggableString();
         }
 
-        return $this->title;
+        $from = $this->resolveSluggableConfig('from', 'sluggable_from', 'title');
+
+        return $this->{$from};
     }
 
-    /**
-     * @param $title
-     * @return string
-     * @throws \Exception
-     */
-    protected function findSlug($title)
+    protected function findSlug(string $title): string
     {
-        // Normalize the title
         $slug = Str::slug($title);
-
-        // Get any that could possibly be related.
-        // This cuts the queries down by doing it once.
         $existingSlugs = $this->getExistingSlugs($slug);
 
-        // If we haven't used it before then we are all good.
-        if (! $existingSlugs->contains('slug', $slug)) {
+        if (!$existingSlugs->contains($this->getSlugField(), $slug)) {
             return $slug;
         }
 
-        // Just append numbers like a savage until we find not used.
         for ($i = 1; $i <= 100; $i++) {
-            $newSlug = $slug.'-'.$i;
-            if (! $existingSlugs->contains('slug', $newSlug)) {
+            $newSlug = $slug . '-' . $i;
+            if (!$existingSlugs->contains($this->getSlugField(), $newSlug)) {
                 return $newSlug;
             }
         }
 
-        throw new \Exception('Can not create a unique slug');
+        throw new \RuntimeException('Can not create a unique slug');
     }
 
-    /**
-     * Generates slug.
-     */
-    public function generateSlug()
+    public function generateSlug(): void
     {
-        $this->slug = $this->findSlug($this->getSluggableString());
+        $this->{$this->getSlugField()} = $this->findSlug($this->getSluggableString());
     }
 
-    /**
-     * @param $query
-     * @param $slug
-     * @return bool|int
-     *
-     * @codeCoverageIgnore Eloquent specific code
-     */
-    public function scopeWhereSlug($query, $slug)
+    public function scopeWhereSlug(Builder $query, string $slug): Builder
     {
-        return $query->where('slug', $slug);
+        return $query->where($this->getSlugField(), $slug);
     }
 
-    /**
-     * @param $slug
-     * @return mixed
-     *
-     * @codeCoverageIgnore Eloquent specific code
-     */
-    public function getExistingSlugs($slug)
+    public function getExistingSlugs(string $slug): Collection
     {
-        return self::select('slug')->where('slug', 'like', $slug.'%')
-            ->when($this->id, function ($query) {
+        $field = $this->getSlugField();
+
+        return static::select($field)->where($field, 'like', $slug . '%')
+            ->when($this->id, function (Builder $query): Builder {
                 return $query->where('id', '<>', $this->id);
             })
             ->get();
+    }
+
+    private function resolveSluggableConfig(string $attrProperty, string $legacyProperty, mixed $default): mixed
+    {
+        $value = static::resolveClassAttribute(HasSlug::class, $attrProperty);
+        if ($value !== null) {
+            return $value;
+        }
+
+        if (isset($this->{$legacyProperty})) {
+            trigger_error(
+                "Using \${$legacyProperty} on " . static::class . ' is deprecated. Use #[HasSlug] attribute instead.',
+                E_USER_DEPRECATED,
+            );
+
+            return $this->{$legacyProperty};
+        }
+
+        return $default;
     }
 }
