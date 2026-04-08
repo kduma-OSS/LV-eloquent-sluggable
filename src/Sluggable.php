@@ -91,10 +91,15 @@ trait Sluggable
         }
 
         if (property_exists($this, $legacyProperty)) {
-            trigger_error(
-                "Using \${$legacyProperty} on " . static::class . ' is deprecated. Use #[HasSlug] attribute instead.',
-                E_USER_DEPRECATED,
-            );
+            static $fired = [];
+            $key = static::class . '::$' . $legacyProperty;
+            if (!isset($fired[$key])) {
+                $fired[$key] = true;
+                trigger_error(
+                    "Using \${$legacyProperty} on " . static::class . ' is deprecated. Use #[HasSlug] attribute instead.',
+                    E_USER_DEPRECATED,
+                );
+            }
 
             return $this->{$legacyProperty} ?? $default;
         }
