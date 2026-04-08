@@ -1,5 +1,9 @@
 # Eloquent Sluggable
 
+[![Latest Stable Version](https://poser.pugx.org/kduma/eloquent-sluggable/v/stable.svg)](https://packagist.org/packages/kduma/eloquent-sluggable)
+[![Total Downloads](https://poser.pugx.org/kduma/eloquent-sluggable/downloads.svg)](https://packagist.org/packages/kduma/eloquent-sluggable)
+[![License](https://poser.pugx.org/kduma/eloquent-sluggable/license.svg)](https://packagist.org/packages/kduma/eloquent-sluggable)
+
 Eloquent trait for automatically generating unique slugs for Laravel models.
 
 Full documentation: [opensource.duma.sh/libraries/php/eloquent-sluggable](https://opensource.duma.sh/libraries/php/eloquent-sluggable)
