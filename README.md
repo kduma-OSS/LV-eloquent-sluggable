@@ -1,12 +1,8 @@
 # Eloquent Sluggable
 
-[![Latest Stable Version](https://poser.pugx.org/kduma/eloquent-sluggable/v/stable.svg)](https://packagist.org/packages/kduma/eloquent-sluggable)
-[![Total Downloads](https://poser.pugx.org/kduma/eloquent-sluggable/downloads.svg)](https://packagist.org/packages/kduma/eloquent-sluggable)
-[![License](https://poser.pugx.org/kduma/eloquent-sluggable/license.svg)](https://packagist.org/packages/kduma/eloquent-sluggable)
+Eloquent trait for automatically generating unique slugs for Laravel models.
 
-Eases using and generating slugs for Laravel Eloquent models.
-
-Check full documentation here: [opensource.duma.sh/libraries/php/eloquent-sluggable](https://opensource.duma.sh/libraries/php/eloquent-sluggable)
+Full documentation: [opensource.duma.sh/libraries/php/eloquent-sluggable](https://opensource.duma.sh/libraries/php/eloquent-sluggable)
 
 ## Requirements
 
@@ -19,86 +15,23 @@ Check full documentation here: [opensource.duma.sh/libraries/php/eloquent-slugga
 composer require kduma/eloquent-sluggable
 ```
 
-## Setup
-
-Add the `Sluggable` trait to your model:
-
-```php
-use KDuma\Eloquent\Sluggable;
-
-class Post extends Model
-{
-    use Sluggable;
-}
-```
-
-In your migration, create a `slug` column:
-
-```php
-$table->string('slug')->unique();
-```
-
-## Configuration
-
-### New style — PHP Attribute (recommended)
+## Usage
 
 ```php
 use KDuma\Eloquent\Sluggable;
 use KDuma\Eloquent\Attributes\HasSlug;
 
-#[HasSlug(from: 'name', field: 'slug')]
-class Product extends Model
-{
-    use Sluggable;
-}
-```
-
-### Old style — model properties (deprecated, triggers `E_USER_DEPRECATED`)
-
-```php
+#[HasSlug(from: 'title', field: 'slug')]
 class Post extends Model
 {
     use Sluggable;
-
-    protected string $sluggable_from = 'name';  // field to generate slug from (default: 'title')
-    protected string $slug_field = 'slug';       // slug column name (default: 'slug')
 }
 ```
 
-### Default behaviour (no configuration)
-
-Without any configuration, the trait reads from the `title` field and stores the slug in the `slug` column.
+Add a `slug` column to your migration:
 
 ```php
-class Post extends Model
-{
-    use Sluggable; // uses $post->title → stores in $post->slug
-}
+$table->string('slug')->unique();
 ```
 
-## Usage
-
-- Slug is automatically generated on `create` and regenerated on `update` if the slug field is empty.
-- `$model->generateSlug()` — manually trigger slug generation (remember to `save()` afterwards)
-- `Model::whereSlug($slug)` — query scope to find by slug
-- `$model->getSlugField()` — returns the configured slug field name
-
-### Custom slug source
-
-Override `SluggableString()` on your model for full control:
-
-```php
-class Post extends Model
-{
-    use Sluggable;
-
-    protected function SluggableString(): string
-    {
-        return $this->year . ' ' . $this->title;
-    }
-}
-```
-
-## Packagist
-
-[kduma/eloquent-sluggable](https://packagist.org/packages/kduma/eloquent-sluggable)
+Slug is auto-generated on create. Find by slug with `Post::whereSlug($slug)`.
